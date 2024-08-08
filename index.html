@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>N-Queens Game</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+        }
+        .queen {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Chess_qlt45.svg/800px-Chess_qlt45.svg.png') center center no-repeat;
+            background-size: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">N-Queens Game</h1>
+        <form class="form-inline justify-content-center">
+            <label for="numQueens" class="mr-sm-2">Number of Queens:</label>
+            <input type="number" class="form-control mb-2 mr-sm-2" id="numQueens" placeholder="Enter number of queens" required>
+            <button type="button" class="btn btn-primary mb-2" onclick="startGame()">Start Game</button>
+        </form>
+        <div id="gameBoard" class="text-center"></div>
+    </div>
+    <script>
+        let numQueens;
+        let queens = [];
+        let placedQueens = 0;
+
+        function startGame() {
+            numQueens = parseInt(document.getElementById('numQueens').value);
+            queens = Array.from({ length: numQueens }, () => Array(numQueens).fill(0));
+            placedQueens = 0;
+            createBoard();
+        }
+
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            const table = document.createElement('table');
+            for (let i = 0; i < numQueens; i++) {
+                const tr = document.createElement('tr');
+                for (let j = 0; j < numQueens; j++) {
+                    const td = document.createElement('td');
+                    td.setAttribute('data-row', i);
+                    td.setAttribute('data-col', j);
+                    td.addEventListener('click', placeQueen);
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            gameBoard.appendChild(table);
+        }
+
+        function placeQueen(event) {
+            const row = parseInt(event.target.getAttribute('data-row'));
+            const col = parseInt(event.target.getAttribute('data-col'));
+            if (isSafe(row, col)) {
+                queens[row][col] = 1;
+                event.target.innerHTML = '<div class="queen"></div>';
+                placedQueens++;
+                if (placedQueens === numQueens) {
+                    alert('All queens placed successfully!');
+                }
+            } else {
+                alert('Invalid position for a queen!');
+            }
+
+            if (placedQueens < numQueens && !hasMoreMoves()) {
+                alert('No more possible moves! Restarting the game...');
+                startGame();
+            }
+        }
+
+        function isSafe(row, col) {
+            for (let i = 0; i < row; i++) {
+                if (queens[i][col] === 1) return false;
+                if (col - (row - i) >= 0 && queens[i][col - (row - i)] === 1) return false;
+                if (col + (row - i) < numQueens && queens[i][col + (row - i)] === 1) return false;
+            }
+            return true;
+        }
+
+        function hasMoreMoves() {
+            for (let row = 0; row < numQueens; row++) {
+                for (let col = 0; col < numQueens; col++) {
+                    if (queens[row][col] === 0 && isSafe(row, col)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
